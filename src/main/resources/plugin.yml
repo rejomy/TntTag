@@ -1,0 +1,17 @@
+name: TntTag
+main: me.rejomy.tnttag.Main
+version: 1.0
+softdepend:
+  - Multiverse-Core
+  - Multiworld
+  - Citizens
+commands:
+  tnttag:
+    aliases:
+      - tt
+      - tntt
+      - ttag
+      - hotpotato
+      - potatohot
+      - hpot
+      - potateh

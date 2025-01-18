@@ -1,0 +1,104 @@
+# * PlaceholderAPI is supported
+# Use: %tnttag_(placeholder)%
+# Placeholders:
+# ingame - NOT_IN_MATCH/true ( waiting, ending )
+# inround - NOT_IN_MATCH/true ( only playing )
+# players - return number of players in match and bots
+# round - round number
+# arena - arena name
+# istnt - arena name
+#
+# online - return all players online
+#
+# rounds - sum of rounds played
+# wins - wins amount
+# kd - kills/deaths
+# games - games played amount
+# *
+#
+# Welcome to TNTTag config :D
+# coded by Rejomy.
+#
+delay:
+  start:
+    min: 120
+    middle: 30
+    max: 5
+  # Delay before teleporting all players to spawn of match end.
+  end: 5
+  # Round players delay. format: players:time in seconds
+  # if players larger than x, use this time.
+  # don`t remove 0 value;
+  round-delay:
+    - "14:60"
+    - "10:50"
+    - "8:45"
+    - "6:40"
+    - "4:30"
+    - "2:20"
+    - "0:20"
+
+  # Delay between rounds
+  round-post: 3
+
+settings:
+  # The value set tnt amount of all players in match.
+  # Example: 30 percentage: 10 players, 3 tnt; or 30 percentage: 9 players, 2 tnt.
+  tnt-players-percentage: 30
+  # Should we kill players who are on the same block as a player who has dynamite?
+  tnt-same-block-kill: false
+  # Should we kill players who had dynamite in the last 200 millis?
+  millis-tnt-kill: false
+
+inventory:
+  queue:
+    command: "&eOpening queue inventory..."
+    name: "TntTag Queue:"
+    arena:
+      name: "&a&l$arena"
+      lore:
+        - "&8TNT Tag"
+        - ""
+        - "&eArena: &6$arena"
+        - "&ePlayers: &6$players"
+        - ""
+        - "&aClick to play!"
+  spectate:
+    command: "&eOpening spectator inventory..."
+    name: "TntTag Matches:"
+    arena:
+      name: "&a&l$arena"
+      lore:
+        - "&8TNT Tag"
+        - ""
+        - "&eArena: &6$arena"
+        - "&ePlayers: &6$players"
+        - ""
+        - "&aClick to spectate!"
+  click-sound: CLICK
+
+game:
+  blew up sound: EXPLODE
+  win sound: LEVEL_UP
+
+# The module set command rules on game.
+command:
+  # You need to select a whitelist mode.
+  # BlackList - Block all commands at the config.
+  # WhiteList - Allow all commands at the config.
+  #
+  # If you want to allow all commands, set the value to blacklist
+  # and set commands: {}
+  #
+  mode: whitelist
+
+  # Write your commands here...
+  commands:
+    - help
+    - donate
+
+# Need citizens plugin.
+npc-settings:
+  npc-in-match: 3
+  attack-range: 3.005
+  attack-delay: 11

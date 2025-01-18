@@ -1,0 +1,34 @@
+# What items will be given out at the end of the game for the winner and the spectators
+ending:
+  8: # it`s slot This is the slot into which the item will be dispensed
+    type: SLIME_BALL
+    name: "&cJoin to new game"
+    lore:
+      - "Join to new game."
+    # Actions when click the items.
+    # $player - player name
+    action:
+      - '[player] tt join'
+
+# Items that will be given out while waiting for a match.
+waiting:
+  8:
+    type: SLIME_BALL
+    name: "&cLobby"
+    lore:
+      - "Just click here."
+    # Actions when click the items.
+    action:
+      - 'tt leave'
+
+  0:
+    type: PAPER
+    name: "&cInfo"
+    lore:
+      - "Just click here."
+    # Actions when click the items.
+    action:
+      - 'dm open info $player'
+
+
+

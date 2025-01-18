@@ -1,0 +1,55 @@
+ARENA_IS_FULL: |-
+  &8          &m-------
+  &4Error! &7The arena $name &fis full&7, please join to the next arena. 
+  &8          &m-------
+
+# The actions on starting game.
+# Format: second per start: action
+# Available format: "message:text", "actionbar:text", "title:text", "subtitle:text", "sound:sound_name"
+starting:
+  all: "actionbar:Waiting players... $players/$max"
+  120:
+    - "message:&7Match will start in &e120 &7seconds."
+  60:
+    - "message:&7Match will start in &e60 &7seconds."
+  30:
+    - "message:&7Match will start in &e30 &7seconds."
+  15:
+    - "message:&7Match will start in &e15 &7seconds."
+  5:
+    - "message:&7Match will start in &e5 &7seconds."
+  4:
+    - "message:&7Match will start in &e4 &7seconds."
+  3:
+    - "title:&cReady"
+    - "message:&7Match will start in &e3 &7seconds."
+  2:
+    - "title:&eSteady"
+    - "message:&7Match will start in &e2 &7seconds."
+  1:
+    - "title:&aGo!"
+    - "message:&7Match will start in &e1 &7second."
+
+
+game:
+  round-start:
+    main: |-
+      &f&l             Round $round has started!
+      &eThe TNT has been released to $tnt
+    tnt: "&c     You started as IT! Tag someone!"
+    life: "&a     You did NOT start as IT! Run away!"
+    spectator: ""
+
+  actionbar tnt: "&cYou are tnt"
+  actionbar life: "&aYou are not tnt"
+  tnt message: "&c$player is IT!"
+  explode: "&7$player is blew up!"
+  win: "&7$player is win!"
+
+waiting:
+  ADD_TO_QUEUE: "&aPlayer $player connected to the server! Waiting for $players/$need."
+  ADD_TO_QUEUE_PLAYER: |-
+    &8          &m-------
+    &4You have connected to arena $arena. Waiting for $players/$need.
+    &8          &m-------
+
