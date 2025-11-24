@@ -62,16 +62,16 @@ public class TntTagTrait extends Trait {
     // Called every tick
     @Override
     public void run() {
-        if(player.getInventory().getItemInHand().getType() == Material.AIR) {
-            // If npc does not have a tnt, we set it to 0, because if npc in pvp, we can`t update player target.
+        if (player.getInventory().getItemInHand().getType() == Material.AIR) {
+            // If npc does not have a tnt, we set it to 0, because if npc in pvp, we can't update player target.
             boolean isFirst = navigatingTicks == 0;
             navigatingTicks = 0;
 
-            if(navigator.getTargetType() == TargetType.ENTITY) {
-                if(skippedTicks++ < 80) {
+            if (navigator.getTargetType() == TargetType.ENTITY) {
+                if (skippedTicks++ < 80) {
                     return;
                 }
-            } else if(navigator.isNavigating()) {
+            } else if (navigator.isNavigating()) {
                 return;
             }
 
@@ -79,7 +79,7 @@ public class TntTagTrait extends Trait {
 
             Main.getInstance().citizens.runAwayFromPlayerWithTnt(match, npc);
 
-            if(isFirst) {
+            if (isFirst) {
                 player.setMaximumNoDamageTicks(40);
 
                 List<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
@@ -91,7 +91,7 @@ public class TntTagTrait extends Trait {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 9999999, 1));
             }
         } else {
-            if(skippedTicks > 0) {
+            if (skippedTicks > 0) {
                 // If npc give tnt other player, at this timing player can give npc back.
                 // When the npc does not have a tnt, skipped ticks add, it may cause npc try to run on pvp.
                 skippedTicks = 0;

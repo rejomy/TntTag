@@ -19,10 +19,11 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class QueueInventory extends AbstractInventory {
-    private Random random = new Random();
+
     public HashMap<Integer, Match> maps = new HashMap<>();
 
     public QueueInventory() {
@@ -37,7 +38,7 @@ public class QueueInventory extends AbstractInventory {
                 .filter(match -> match.getArena().status != Arena.Status.ENDING
                     && match.getArena().status != Arena.Status.PLAYING)
                 .sorted(Comparator.comparingInt(match -> -match.players.size())
-        ).collect(Collectors.toList());
+        ).toList();
 
         int count = 0;
 
@@ -79,7 +80,7 @@ public class QueueInventory extends AbstractInventory {
                     break;
                 }
 
-                int index = random.nextInt(freeArena.size());
+                int index = ThreadLocalRandom.current().nextInt(freeArena.size());
                 Arena arena = freeArena.remove(index);
                 Match match = matchManager.create(arena);
 

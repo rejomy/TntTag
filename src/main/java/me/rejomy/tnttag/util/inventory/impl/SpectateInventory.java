@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SpectateInventory extends AbstractInventory {
-    private Random random = new Random();
+
     public HashMap<Integer, Match> maps = new HashMap<>();
 
     public SpectateInventory() {
@@ -35,7 +35,7 @@ public class SpectateInventory extends AbstractInventory {
                     && match.getArena().status != Arena.Status.WAITING
                     && match.getArena().status != Arena.Status.STARTING)
                 .sorted(Comparator.comparingInt(match -> -match.round)
-                ).collect(Collectors.toList());
+                ).toList();
 
         int offset = 0;
 
