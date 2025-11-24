@@ -219,7 +219,7 @@ public class CitizensUtil {
                 if (player.getLocation().distanceSquared(match.getArena().start) > 144) {
                     npc.getNavigator().setTarget(match.getArena().start);
                 } else {
-                    npc.getNavigator().setTarget(getNavigateLocation(npc, killer));
+                    npc.getNavigator().setTarget(getNavigateLocation(npc));
                 }
             } else {
                 npc.getNavigator().setTarget(victim.getLocation());
@@ -227,25 +227,18 @@ public class CitizensUtil {
         }
     }
 
-    public Location getNavigateLocation(NPC npc, Player killer) {
-        int MAX_ATTEMPTS_TO_FIND_POSITION = 5;
-        Player player = (Player) npc.getEntity();
-        Location location = player.getLocation().clone();
+    public Location getNavigateLocation(NPC npc) {
+        Location location = npc.getEntity().getLocation().clone();
 
-        for (byte attempt = 0; attempt < MAX_ATTEMPTS_TO_FIND_POSITION; attempt++) {
-            int multiplier = ThreadLocalRandom.current().nextBoolean() ? -1 : 1;
-            double newX = location.getX() + (10 + ThreadLocalRandom.current().nextInt(30)) * multiplier;
-            double newZ = location.getZ() + (10 + ThreadLocalRandom.current().nextInt(30)) * multiplier;
+        double newX = location.getX() + ThreadLocalRandom.current().nextInt(-30, 30);
+        double newZ = location.getZ() + ThreadLocalRandom.current().nextInt(-30, 30);
 
-            for (byte j = -20; j < 20; j++) {
-                Location newLoc = new Location(location.getWorld(), newX, location.getY() + j, newZ);
-                if (newLoc.getBlock() != null && newLoc.getBlock().getType().isSolid()) {
-                    if (npc.getNavigator().canNavigateTo(newLoc)
-                            && killer.getLocation().distance(npc.getEntity().getLocation()) < newLoc.distance(killer.getLocation())) {
-                        return newLoc;
-                    }
-                }
-            }
+        for (byte j = -5; j < 5; j++) {
+            Location newLoc = new Location(location.getWorld(), newX, location.getY() + j, newZ);
+
+            if (newLoc.getBlock().getType().isSolid()
+                && !newLoc.add(0, 1, 0).getBlock().getType().isSolid())
+                return newLoc;
         }
 
         return null;
