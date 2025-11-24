@@ -16,12 +16,12 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 
     flatDir {
-        dirs("libs")  // Указываем папку libs как источник зависимостей
+        dirs("libs")
     }
 }
 
 dependencies {
     compileOnly("me.clip:placeholderapi:2.11.5")
-    compileOnly(files("libs/server.jar"))  // Указываем путь к JAR-файлу напрямую
-    compileOnly(files("libs/citizensapi-2.0.33-SNAPSHOT.jar"))
+    compileOnly(files("libs/citizensapi-2.0.40-SNAPSHOT.jar"))
+    compileOnly(files("libs/server.jar"))
 }
