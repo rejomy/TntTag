@@ -106,7 +106,6 @@ public class PlayTask extends BukkitRunnable {
 
                 for (NPC npc : match.npcs.keySet()) {
                     npc.getEntity().teleport(match.getArena().start);
-                    ((Player) npc.getEntity()).setMaximumNoDamageTicks(40);
                 }
             }
 

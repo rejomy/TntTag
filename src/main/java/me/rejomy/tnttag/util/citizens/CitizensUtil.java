@@ -60,7 +60,6 @@ public class CitizensUtil {
         npc.setProtected(false);
 
         Player player = (Player) npc.getEntity();
-        player.setMaximumNoDamageTicks(40);
 
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
             List<PotionEffect> effects = new ArrayList<>(player.getActivePotionEffects());
@@ -137,9 +136,9 @@ public class CitizensUtil {
         });
     }
 
-    public String giveTnt(Match match, NPC npc) {
+    public void giveTnt(Match match, NPC npc) {
         if (!enable) {
-            return null;
+            return;
         }
 
         Player player = (Player) npc.getEntity();
@@ -162,8 +161,6 @@ public class CitizensUtil {
         match.sendMessage(Main.getInstance().getValue().GAME_TNT_MESSAGE.replace("$player", player.getDisplayName()));
 
         match.npcs.get(npc).setHasTntStatus(true);
-
-        return npc.getName();
     }
 
     public void remove(NPC npc) {
@@ -244,6 +241,7 @@ public class CitizensUtil {
         return null;
     }
 
+    // Find a target without tnt and chase it.
     public void chasePlayersWithoutTnt(Match match, NPC npc) {
         if (!enable) {
             return;
@@ -251,15 +249,16 @@ public class CitizensUtil {
 
         Location location = npc.getEntity().getLocation();
 
-        Player target = match.getAlivePlayers().stream()
+        match.getAlivePlayers().stream()
                 .filter(player -> player.getInventory().getHelmet() == null
                         || player.getInventory().getHelmet().getType() != Material.TNT)
                 .min(Comparator.comparing(player -> player.getLocation().distanceSquared(location)))
-                .orElse(null);
-
-        if (target != null) {
-            npc.getNavigator().setTarget(target, true);
-        }
+                .ifPresent(target -> {
+                    // Do not reset current navigation if we already chasing the same player.
+                    if (npc.getNavigator().getEntityTarget() == null ||
+                            npc.getNavigator().getEntityTarget().getTarget() != target)
+                        npc.getNavigator().setTarget(target, true);
+                });
     }
 
     private Player getPlayerWithoutTnt(Match match, Player player) {
