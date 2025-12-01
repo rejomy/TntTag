@@ -9,10 +9,6 @@ import me.rejomy.tnttag.match.MatchManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.stream.Collectors;
 
 public class Expansion extends PlaceholderExpansion {
     private Main plugin = Main.getInstance();
@@ -54,7 +50,7 @@ public class Expansion extends PlaceholderExpansion {
             case "rounds":
                 return String.valueOf(data.rounds);
             case "kd":
-                return String.valueOf(data.killsAndDeath);
+                return String.valueOf(data.winsAndLoses);
             case "games":
                 return String.valueOf(data.games);
         }

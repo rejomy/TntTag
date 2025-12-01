@@ -1,13 +1,11 @@
 package me.rejomy.tnttag.task;
 
 import me.rejomy.tnttag.Main;
-import me.rejomy.tnttag.data.DataManager;
-import me.rejomy.tnttag.data.PlayerData;
 import me.rejomy.tnttag.match.Match;
 import me.rejomy.tnttag.util.ActionBar;
 import me.rejomy.tnttag.util.RandomUtil;
-import me.rejomy.tnttag.util.citizens.CitizensUtil;
 import me.rejomy.tnttag.util.PlayerTnt;
+import me.rejomy.tnttag.util.citizens.CitizensUtil;
 import me.rejomy.tnttag.util.person.PersonManager;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Bukkit;
@@ -18,10 +16,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PlayTask extends BukkitRunnable {
+
+    private final CitizensUtil citizensUtil = Main.getInstance().citizens;
+    private final Match match;
     public int taskId;
     private int delay;
-    private final Match match;
-    final CitizensUtil citizens = Main.getInstance().citizens;
 
     public PlayTask(Match match) {
         this.match = match;
@@ -41,7 +40,7 @@ public class PlayTask extends BukkitRunnable {
             match.end();
 
             for (NPC npc : match.npcs.keySet()) {
-                citizens.remove(npc);
+                citizensUtil.remove(npc);
             }
 
             return;
@@ -50,51 +49,9 @@ public class PlayTask extends BukkitRunnable {
         // Если время раунда истекло:
         // Взрываем всех и начинаем новый раунд.
         if (delay == 0) {
-            for (Map.Entry<Player, PlayerTnt> map : match.players.entrySet()) {
-                if (map.getValue().isTnt()) {
-                    Player player = map.getKey();
-                    PlayerTnt playerTnt = map.getValue();
-
-                    playerTnt.spectator = true;
-                    playerTnt.setHasTntStatus(false);
-
-                    match.blewUp(player);
-
-                    // Если включено убийство игроков на одном блоке с тнт.
-                    // Проходимся по игрокам без тнт и убиваем их.
-                    if (Main.getInstance().getValue().killSameBlockWithTnt) {
-                        map.getKey().getLocation().getWorld()
-                                .getNearbyEntities(map.getKey().getLocation(), 1, 1, 1)
-                                .stream()
-                                .filter(entity -> entity != player && entity instanceof Player && !entity.hasMetadata("NPC")
-                                        && !match.players.get(entity).isTnt())
-                                .map(entity -> (Player) entity)
-                                .forEach(match::blewUp);
-                    }
-
-                    PlayerData data = DataManager.get(player.getUniqueId());
-                    data.games++;
-
-                    int deaths = data.games - data.wins;
-                    float kd = deaths > 0 ? (float) data.wins / deaths : data.wins;
-                    data.killsAndDeath = ((int) (kd * 100.0)) / 100.0;
-
-                    data.rounds += match.round;
-                }
-
-                map.getKey().setLevel(0);
-            }
-
-            if (Main.getInstance().getValue().killLastMSTntPlayers) {
-                match.players.entrySet().stream().filter(map ->
-                                !map.getValue().isTnt()
-                                        && !map.getValue().spectator
-                                        && System.currentTimeMillis() - map.getValue().lastTntTime <= 100)
-                        .map(Map.Entry::getKey)
-                        .forEach(match::blewUp);
-            }
-
-            citizens.blewUp(match);
+            // Reset the level of XP as we are using it for time counting.
+            match.getAlivePlayers().forEach(player -> player.setLevel(0));
+            match.findAndBlewUpPlayers();
             return;
         } else if (delay == -Main.getInstance().getValue().DELAY_ROUND_POST || match.round == 0) {
             delay = getRoundDelay();
@@ -174,8 +131,8 @@ public class PlayTask extends BukkitRunnable {
             Object player = alivePlayers.get(a);
 
             if (player instanceof NPC) {
-                citizens.giveTnt(match, (NPC) player);
-                citizens.chasePlayersWithoutTnt(match, (NPC) player);
+                citizensUtil.giveTnt(match, (NPC) player);
+                citizensUtil.chasePlayersWithoutTnt(match, (NPC) player);
                 tntNames.add(((NPC) player).getName());
 
                 // Отправляем фразу в чат.

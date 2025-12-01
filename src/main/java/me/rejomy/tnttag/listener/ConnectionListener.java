@@ -6,7 +6,6 @@ import me.rejomy.tnttag.data.DataManager;
 import me.rejomy.tnttag.data.PlayerData;
 import me.rejomy.tnttag.match.Match;
 import me.rejomy.tnttag.match.MatchManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +22,7 @@ public class ConnectionListener implements Listener {
         if (DataManager.get(player.getUniqueId()) == null) {
             PlayerData data = new PlayerData();
             data.uuid = player.getUniqueId();
-            data.killsAndDeath = 0;
+            data.winsAndLoses = 0;
             DataManager.add(data);
         }
     }

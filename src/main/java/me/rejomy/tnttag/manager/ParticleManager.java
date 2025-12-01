@@ -7,8 +7,10 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 public class ParticleManager {
-    private Match match;
+
+    private final Match match;
     private Sound WIN_SOUND, EXPLODE_SOUND;
+
     public ParticleManager(Match match) {
         this.match = match;
         load();
@@ -23,10 +25,10 @@ public class ParticleManager {
     }
 
     private void play(Match match, Player target, Effect effect, Sound sound) {
-        for(Player player : match.players.keySet()) {
+        for (Player player : match.players.keySet()) {
             player.playEffect(target.getLocation(), effect, 10);
 
-            if(sound != null) {
+            if (sound != null) {
                 player.playSound(target.getLocation(), sound, 2f, 2f);
             }
         }

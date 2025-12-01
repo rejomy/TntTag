@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static me.rejomy.tnttag.util.RandomUtil.RANDOM;
 
 public class PersonManager {
+
     private static final List<PersonBuilder> PERSONS = new ArrayList<>();
     public static final String[] ADDITIONAL_NAMES = {"Pvp", "Pro", "Sad", "Bro", "Top", "GOD", "Angel"};
 
@@ -30,7 +31,7 @@ public class PersonManager {
         List<PersonBuilder> copyPersons = new ArrayList<>(PERSONS);
         PersonBuilder[] persons = new PersonBuilder[amount];
 
-        for(byte a = 0; a < amount; a++) {
+        for (byte a = 0; a < amount; a++) {
             int personIndex = RANDOM.nextInt(copyPersons.size());
             persons[a] = copyPersons.get(personIndex);
             copyPersons.remove(personIndex);
@@ -40,8 +41,8 @@ public class PersonManager {
     }
 
     public static PersonBuilder getPersonByName(String personName) {
-        for(PersonBuilder person : PERSONS) {
-            if(personName.contains(person.getDefaultName())) {
+        for (PersonBuilder person : PERSONS) {
+            if (personName.contains(person.getDefaultName())) {
                 return person;
             }
         }

@@ -26,7 +26,7 @@ public class Match {
 
     /**
      * Need for prevent duplicate waiting task when player rejoin instantly, that triggering new waiting task.
-     *  and cause problems
+     * and cause problems
      */
     public boolean taskIsRunning;
 
@@ -35,9 +35,11 @@ public class Match {
     public final ParticleManager particle = new ParticleManager(this);
     private final ItemStack itemTnt;
     private Arena arena;
+
     public Arena getArena() {
         return arena;
     }
+
     public HashMap<NPC, PlayerTnt> npcs = new HashMap<>();
     public HashMap<Player, PlayerTnt> players = new HashMap<>();
 
@@ -57,23 +59,23 @@ public class Match {
     }
 
     public void remove(Player player) {
-        if(players.get(player).spectator) {
+        if (players.get(player).spectator) {
             player.setFlying(false);
             player.setAllowFlight(false);
         }
 
         players.remove(player);
 
-        for(Player target : players.keySet()) {
+        for (Player target : players.keySet()) {
             target.showPlayer(player);
         }
 
-        if(arena.status == Arena.Status.STARTING || arena.status == Arena.Status.WAITING) {
+        if (arena.status == Arena.Status.STARTING || arena.status == Arena.Status.WAITING) {
             if (players.size() < getArena().min) {
                 arena.status = Arena.Status.WAITING;
             }
             Main.getInstance().getQueueInventory().put();
-        } else if(arena.status == Arena.Status.PLAYING) {
+        } else if (arena.status == Arena.Status.PLAYING) {
             Main.getInstance().getSpectateInventory().put();
         }
     }
@@ -82,8 +84,14 @@ public class Match {
         sendMessage(Main.getInstance().getValue().EXPLODE_MESSAGE.replace("$player", player.getName()));
         particle.blewUp(player);
 
-        players.get(player).spectator = true;
+        PlayerTnt matchData = players.get(player);
+        matchData.setHasTntStatus(false);
+        matchData.spectator = true;
+
         setSpectator(player);
+
+        PlayerData data = DataManager.get(player.getUniqueId());
+        data.updateMatchBasedStats(round, false);
     }
 
     public void setSpectator(Player player) {
@@ -96,7 +104,7 @@ public class Match {
             }
         }
 
-        for(Map.Entry<Integer, ItemObject> items : Main.getInstance().getItemsConfig().ENDING_ITEMS.entrySet()) {
+        for (Map.Entry<Integer, ItemObject> items : Main.getInstance().getItemsConfig().ENDING_ITEMS.entrySet()) {
             player.getInventory().setItem(items.getKey(), items.getValue().item);
         }
 
@@ -134,10 +142,51 @@ public class Match {
     public boolean isTnt(Player player) {
         return players.get(player) != null && players.get(player).isTnt();
     }
+
     public List<Player> getAlivePlayers() {
         return players.entrySet().stream().filter(map -> !map.getValue().spectator)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+    }
+
+    public void findAndBlewUpPlayers() {
+        // Loop and find players with tnt.
+        for (Map.Entry<Player, PlayerTnt> map : players.entrySet()) {
+            Player player = map.getKey();
+            PlayerTnt playerTnt = map.getValue();
+
+            // Skip players without tnt.
+            if (!playerTnt.isTnt()) {
+                continue;
+            }
+
+            // Blew up the player
+            blewUp(player);
+
+            if (Main.getInstance().getValue().killSameBlockWithTnt) {
+                // Loop through all players that standing in the same block with tnt
+                // and blew them up.
+                players.entrySet().stream()
+                        .filter(entry ->
+                                !entry.getValue().spectator &&
+                                !entry.getValue().isTnt() &&
+                                player.getLocation().distance(entry.getKey().getLocation()) < 1)
+                        .map(entity -> (Player) entity)
+                        .forEach(this::blewUp);
+            }
+        }
+
+        if (Main.getInstance().getValue().killLastMSTntPlayers) {
+            players.entrySet().stream()
+                    .filter(entry ->
+                            !entry.getValue().isTnt() &&
+                            !entry.getValue().spectator &&
+                            System.currentTimeMillis() - entry.getValue().lastTntTime <= 100)
+                    .map(Map.Entry::getKey)
+                    .forEach(this::blewUp);
+        }
+
+        Main.getInstance().citizens.blewUp(this);
     }
 
     public void end() {
@@ -148,7 +197,7 @@ public class Match {
             PlayerUtil.clearEffects(player);
             PlayerUtil.clearInventory(player);
 
-            for(Map.Entry<Integer, ItemObject> items : Main.getInstance().getItemsConfig().ENDING_ITEMS.entrySet()) {
+            for (Map.Entry<Integer, ItemObject> items : Main.getInstance().getItemsConfig().ENDING_ITEMS.entrySet()) {
                 player.getInventory().setItem(items.getKey(), items.getValue().item);
             }
 
@@ -161,23 +210,16 @@ public class Match {
                         target.showPlayer(player);
                     }
                 }
-
             } else {
                 PlayerData data = DataManager.get(player.getUniqueId());
-                data.games++;
-                data.wins++;
-                data.rounds+=round;
-
-                int deaths = data.games - data.wins;
-                float kd = deaths > 0? (float) data.wins / deaths : data.wins;
-                data.killsAndDeath = ((int) (kd * 100.0)) / 100.0;
+                data.updateMatchBasedStats(round, true);
 
                 sendMessage(Main.getInstance().getValue().WIN_MESSAGE.replace("$player", player.getName()));
                 particle.win(player);
             }
         }
 
-        if(!npcs.isEmpty()) {
+        if (!npcs.isEmpty()) {
             NPC winner = npcs.keySet().iterator().next();
             Player player = (Player) winner.getEntity();
             sendMessage(Main.getInstance().getValue().WIN_MESSAGE.replace("$player", player.getName()));
@@ -221,5 +263,4 @@ public class Match {
 
         return compass;
     }
-
 }

@@ -1,12 +1,9 @@
 package me.rejomy.tnttag.database;
 
-import me.rejomy.tnttag.Main;
 import me.rejomy.tnttag.data.DataManager;
 import me.rejomy.tnttag.data.PlayerData;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public abstract class DataBase {
@@ -83,7 +80,7 @@ public abstract class DataBase {
             playerData.rounds = resultSet.getInt("rounds");
             playerData.wins = resultSet.getInt("wins");
             playerData.games = resultSet.getInt("games");
-            playerData.killsAndDeath = resultSet.getDouble("kd");
+            playerData.winsAndLoses = resultSet.getDouble("kd");
 
             // Добавляем объект в список
             DataManager.add(playerData);
@@ -98,7 +95,7 @@ public abstract class DataBase {
         // Перебираем все элементы списка playersData
         for (PlayerData playerData : DataManager.USERS) {
             set(playerData.uuid,
-                    playerData.wins, playerData.games, playerData.rounds, playerData.killsAndDeath, System.currentTimeMillis());
+                    playerData.wins, playerData.games, playerData.rounds, playerData.winsAndLoses, System.currentTimeMillis());
         }
     }
 }

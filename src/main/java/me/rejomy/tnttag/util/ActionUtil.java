@@ -9,6 +9,7 @@ import java.util.List;
 import static me.rejomy.tnttag.util.SoundUtil.getSound;
 
 public class ActionUtil {
+
     public static void handle(Player player, int delay, HashMap<String, List<String>> actionsMap, String period, Match match) {
         if (actionsMap.containsKey("all")) {
             runActions(player, actionsMap.get("all"), period, match);

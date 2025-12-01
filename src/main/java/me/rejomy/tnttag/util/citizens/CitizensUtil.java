@@ -19,7 +19,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class CitizensUtil {
 
@@ -106,30 +105,32 @@ public class CitizensUtil {
             return;
         }
 
-        match.npcs.entrySet().removeIf(map -> {
-            if (map.getValue().isTnt()) {
+        match.npcs.entrySet().removeIf(entry -> {
+            NPC npc = entry.getKey();
+            PlayerTnt data = entry.getValue();
+
+            // If the NPC is TNT or has TNT with killLastMSTntPlayers feature enabled since 100 ms.
+            if (data.isTnt() ||
+                Main.getInstance().getValue().killLastMSTntPlayers &&
+                        System.currentTimeMillis() - data.lastTntTime < 100) {
                 // Если включено убийство игроков на одном блоке с тнт.
                 // Проходимся по игрокам без тнт и убиваем их.
                 if (Main.getInstance().getValue().killSameBlockWithTnt) {
-                    List<Player> players = map.getKey().getEntity().getLocation().getWorld().getNearbyEntities(
-                                    map.getKey().getEntity().getLocation(), 1, 1, 1).stream()
-                            .filter(entity -> entity instanceof Player && !entity.hasMetadata("NPC")
-                                    && !match.players.get(entity).isTnt())
+                    match.players.entrySet().stream()
+                            .filter(entry2 ->
+                                    !entry2.getValue().spectator &&
+                                    !entry2.getValue().isTnt() &&
+                                    npc.getEntity().getLocation().distance(entry2.getKey().getLocation()) < 1)
                             .map(entity -> (Player) entity)
-                            .collect(Collectors.toList());
-
-                    for (Player player : players) {
-                        match.blewUp(player);
-                    }
+                            .forEach(match::blewUp);
                 }
 
-                match.particle.blewUp((Player) map.getKey().getEntity());
+                match.particle.blewUp((Player) entry.getKey().getEntity());
                 match.sendMessage(Main.getInstance().getValue().EXPLODE_MESSAGE
-                        .replace("$player", map.getKey().getName()));
-                remove(map.getKey());
+                        .replace("$player", entry.getKey().getName()));
+                remove(entry.getKey());
                 return true;
             } else {
-                NPC npc = map.getKey();
                 npc.getNavigator().setTarget(null, false);
                 return false;
             }
